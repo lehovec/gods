@@ -173,6 +173,9 @@ func (gods *GoDS) GetPatch(connId  interface{}) ([]DSPatch, error) {
 	if !exists {
 		return nil, errors.New("Connection does't exitst")
 	}
+	if len(conn.stack) == cap(conn.stack) {
+		return nil, errors.New("Patches exceed stack capacity, cannot create more patces.")
+	}
 
 	document, err := gods.getDoc(connId)
 	if err != nil { return nil, err }
@@ -271,8 +274,13 @@ func (gods *GoDS) AddClientConnection(key interface{}) {
 	gods.setBackup(key, doc);
 }
 
-func (gods *GoDS) addConnection(key interface{}, isClient bool) {
-	gods.connections[key] = &connection{stack: make([]DSPatch, 0, 32), isClient: isClient} // TODO: add checker to too big stack
+func (gods *GoDS) addConnection(connId interface{}, isClient bool) {
+	gods.connections[connId] = &connection{stack: make([]DSPatch, 0, 32), isClient: isClient}
+}
+
+// Remove connection by id
+func (gods *GoDS) RemoveConnection(connId interface{}) {
+	delete(gods.connections, connId)
 }
 
 // Inicialize new differential synchronization object

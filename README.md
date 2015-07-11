@@ -34,7 +34,14 @@ diffSync := gods.New()
 diffSync.AddClientConnection(<id>)
 diffSync.AddServerConnection(<id>)
 ```
-<id> param identifies synchronization cycle. Id can be any comparable type (see [Go comparison operators](https://golang.org/ref/spec#Comparison_operators))
+<id> param identifies synchronization cycle. ID can be any comparable type (see [Go comparison operators](https://golang.org/ref/spec#Comparison_operators))
+Note: You can't create server and client connection with same ID.
+
+GoDS doesn't check connection status, you must remove connections cycles manually:
+```go
+diffSync := gods.New()
+diffSync.RemoveConnection(<id>)
+```
 
 There are two main method of GoDS lib. Fist is **_GetPatch_**. This method generate patches for send to client or server. Method receive id of connection cycle.
 ```go
@@ -68,9 +75,14 @@ Methods Set and Get save three types of documents defined by first param docType
 * DOCTYPE_DOCUMENT
 * DOCTYPE_SHADOW
 * DOCTYPE_BACKUP
+
 Second param is id of connection cycle. Every connection cycle has own unique DOCTYPE_SHADOW, and DOCTYPE_BACKUP. DOCTYPE_DOCUMENT is common for entire GoDS instance.
 Get function returns document content.
 Set function last param is saved document content.
+Note: _RemoveConnection_ method doesn't call Storage methods.
+
+##### Errors
+Methods can send errors, in almost every case is good to remove connection and create new. For list which method return errors, see godoc.
 
 #### Examples
 All examples is available in examples dir.
@@ -78,7 +90,7 @@ There is only one example but more examples will be added in future
 
 #### Notes
 Lib is not tested and I am beginner at Go. Please criticize my code or my english and creates issues. Thanks.
-Test will be added later.
+Test will be added later just as errors documentation.
 
 #### Support
 If you do have a contribution for the package feel free to put up a Pull Request or open Issue.
